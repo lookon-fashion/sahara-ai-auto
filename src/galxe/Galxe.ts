@@ -3,7 +3,7 @@ import axios, { AxiosProxyConfig, AxiosRequestConfig } from "axios"
 import UserAgent from "user-agents"
 import uuid4 from "uuid4"
 
-import { Client } from "@/eth-async/client"
+import { Client } from "@/eth-async"
 import { AccountInfoResponse, CampaignResponse, CampaignType, CreateNewAccountResponse, Cred, IsAccountExistResponse, IsUsernameExistResponse, SignInResponse } from "@/galxe/types"
 import { GlobalClient } from "@/GlobalClient"
 import { getProxyConfigAxios, getRandomNumber, logger, randomStringForEntropy } from "@/helpers"

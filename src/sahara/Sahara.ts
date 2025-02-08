@@ -2,8 +2,7 @@ import axios, { AxiosError, AxiosProxyConfig, AxiosRequestConfig } from "axios"
 import UserAgent from "user-agents"
 import uuid4 from "uuid4"
 
-import { Client } from "@/eth-async/client"
-import { TokenAmount } from "@/eth-async/data/models"
+import { Client , TokenAmount } from "@/eth-async"
 import { GlobalClient } from "@/GlobalClient"
 import { getProxyConfigAxios, logger, sleep } from "@/helpers"
 
@@ -220,7 +219,7 @@ class Sahara {
       {
         accountName: this.client.name,
         ua: this.userAgent,
-        proxy: this.proxy ? `${this.proxy.auth?.username}:${this.proxy.auth?.password}@${this.proxy.host}:${this.proxy.port}` : void 0,
+        proxy: this.proxy,
       },
     )
 
@@ -228,7 +227,7 @@ class Sahara {
       const response = await axios.post<GetTokensFromFaucetSuccessResponseTypes>(
         this.API_URL_FAUCET_CLAIM,
         {
-          "address": this.evmClient.signer.address,
+          address: this.evmClient.signer.address,
         },
         {
           headers: {
@@ -236,7 +235,7 @@ class Sahara {
             "accept-language": "en-US,en;q=0.8",
             "cache-control": "no-cache",
             "content-type": "application/json",
-            "h-captcha-response": captchaResponse,
+            "h-captcha-response": captchaResponse.data,
             "origin": "https://faucet.saharalabs.ai",
             "pragma": "no-cache",
             "priority": "u=1, i",
@@ -250,7 +249,7 @@ class Sahara {
       logger.success(`Account ${this.client.name} | Claimed tokens from faucet: ${response.data.msg}`)
     } catch (error) {
       const typedError = error as AxiosError<GetTokensFromFaucetErrorResponseTypes>
-      logger.error(`Account ${this.client.name} | Error while getting tokens from faucet ${typedError.response?.data.msg}`)
+      logger.error(`Account ${this.client.name} | Error while getting tokens from faucet ${error}`)
     }
 
   }

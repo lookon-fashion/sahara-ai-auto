@@ -1,12 +1,11 @@
 import Decimal from "decimal.js"
 
-import { Client } from "./eth-async/client"
-import { Networks } from "./eth-async/data/models"
-import { getWallets } from "./db"
-import { GlobalClient } from "./GlobalClient"
-import { getRandomNumber, logger,sleep } from "./helpers"
-import { checkProxy } from "./proxyChecker"
-import { SaharaDailyTasks } from "./sahara"
+import { getWallets } from "@/db"
+import { Client, Networks } from "@/eth-async"
+import { GlobalClient } from "@/GlobalClient"
+import { getRandomNumber, logger, shuffleArray, sleep } from "@/helpers"
+import { checkProxy } from "@/proxyChecker"
+import { SaharaDailyTasks } from "@/sahara"
 
 const claimGalxe = async (client: GlobalClient) => {
   await sleep(getRandomNumber(1, 15, true))
@@ -40,8 +39,10 @@ const claimSahara = async (client: GlobalClient) => {
 }
 
 const handleAll = async () => {
-  const wallets = await getWallets()
+  const wallets = shuffleArray(await getWallets())
+
   const promises: Promise<void>[] = []
+  /* const wallets = [wallet!] */
 
   for (const wallet of wallets) {
     if (!wallet.proxy) {
@@ -56,10 +57,11 @@ const handleAll = async () => {
       continue
     }
 
-    const client = new GlobalClient(wallet.name, new Client(wallet.privateKey, Networks.SaharaAI), wallet.refCode || "")
+    const client = new GlobalClient(wallet.name, new Client(wallet.privateKey, Networks.SaharaAI, wallet.proxy), wallet.refCode || "", wallet.proxy)
 
-    promises.push(claimGalxe(client))
-    promises.push(claimSahara(client))
+    promises.push(client.sahara.getTokensFromFaucet())
+    // promises.push(claimGalxe(client))
+    // promises.push(claimSahara(client))
 
   }
 

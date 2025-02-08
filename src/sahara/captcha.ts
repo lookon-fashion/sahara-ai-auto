@@ -1,6 +1,7 @@
-import axios from "axios"
+import { Solver } from "@2captcha/captcha-solver"
+import axios, { AxiosProxyConfig } from "axios"
 
-import { CAPTCHA_BESTSOLVER_KEY } from "@/config"
+import { CAPTCHA_BESTSOLVER_KEY, CAPTCHA_RUCAPTCHA_KEY } from "@/config"
 import { logger, sleep } from "@/helpers"
 
 import "dotenv/config"
@@ -43,7 +44,7 @@ type SolveHCaptchaFuncType = {
   accountName?: string
 }
 
-const solveHCaptcha = async ({ ua, proxy, accountName }: SolveHCaptchaFuncType): Promise<string> => {
+const solveHCaptcha1 = async ({ ua, proxy, accountName }: SolveHCaptchaFuncType): Promise<string> => {
   let attempts = 0
   const maxAttemptsBeforePause = 10
 
@@ -92,6 +93,48 @@ const solveHCaptcha = async ({ ua, proxy, accountName }: SolveHCaptchaFuncType):
   }
 
   return attemptSolve()
+}
+
+const TwoCaptchaSolver = new Solver(CAPTCHA_RUCAPTCHA_KEY)
+
+const solveHCaptcha = async ({ ua, accountName, proxy }: { ua: string; accountName: string; proxy?: AxiosProxyConfig | null }) => {
+  logger.info(`Account ${accountName} | Start solving HCaptcha captcha`)
+
+  while (true) {
+    try {
+
+      const result = await TwoCaptchaSolver.hcaptcha({
+        pageurl: "https://faucet.saharalabs.ai/",
+        sitekey: "94998d34-914f-4b97-8510-b3dc0d8e4aef",
+        userAgent: ua,
+        proxytype: proxy ? proxy.protocol : undefined,
+        proxy: proxy ? `${proxy.auth!.username}:${proxy.auth!.password}@${proxy.host}:${proxy.port}` : void 0,
+      }).then(e => {
+        return e as unknown as TwoCaptchaAnswer
+      })
+
+      // const result = await TwoCaptchaSolver.geetestV4({
+      //   pageurl: "https://app.galxe.com/quest",
+      //   captcha_id: GALXE_GEETEST_ID,
+      //   userAgent: ua,
+      //   proxytype: proxy ? proxy.protocol : undefined,
+      //   proxy: proxy ? `${proxy.auth!.username}:${proxy.auth!.password}@${proxy.host}:${proxy.port}` : void 0,
+      // }).then(e => {
+      //   return e as unknown as TwoCaptchaAnswer
+      // })
+
+      logger.info(`Account ${accountName} | HCaptcha solved`)
+      return result
+    } catch (e) {
+      logger.info(`Account ${accountName} | HCaptcha captcha not solved, retrying... Error: ${e}`)
+      await sleep(2)
+    }
+  }
+}
+
+type TwoCaptchaAnswer = {
+  status: string
+  data: string
 }
 
 const sendCaptcha = async (ua: string, proxy?: string): Promise<number | HCaptchaError> => {

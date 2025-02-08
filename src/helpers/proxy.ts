@@ -8,6 +8,7 @@ export const getProxyConfigAxios = (proxy: string): AxiosProxyConfig => {
   const [server, port] = serverPort.split(":")
 
   const proxyConfig = {
+    protocol: proxy.includes("://") ? proxy.split("://")[0] : "http",
     host: server,
     port: Number(port),
     auth: {

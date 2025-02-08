@@ -85,7 +85,7 @@ const getWallets = async () => {
 const getTestWallet = async () => {
   return await Wallet.findOne({
     where: {
-      name: "main",
+      name: "debarcader-7",
     },
   })
 }

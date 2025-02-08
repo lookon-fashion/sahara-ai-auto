@@ -4,7 +4,7 @@ import fs from "fs"
 
 import { CSV_DATA_PATH, REF_CODES } from "@/config"
 import { getWallet, Wallet } from "@/db"
-import { Client } from "@/eth-async/client"
+import { Client } from "@/eth-async"
 
 const DEV_REF_CODE = "NQWD0N"
 

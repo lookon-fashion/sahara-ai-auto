@@ -1,4 +1,4 @@
-import { Client } from "@/eth-async/client"
+import { Client } from "@/eth-async"
 import { Galxe } from "@/galxe"
 import { Sahara } from "@/sahara"
 
@@ -10,11 +10,11 @@ class GlobalClient {
   ref: string
   proxy: string | null
 
-  constructor(name: string, evmClient: Client, ref: string) {
+  constructor(name: string, evmClient: Client, ref: string, proxy: string | null) {
     this.name = name
     this.ref = ref
     this.evmClient = evmClient
-    this.proxy = evmClient.proxy
+    this.proxy = proxy
     this.galxe = new Galxe(this)
     this.sahara = new Sahara(this)
   }
