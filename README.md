@@ -1,6 +1,10 @@
 # Sahara AI automation tool
 
 <div align="center">
+  <img src="image.png" alt="Sahara AI">  
+</div>
+
+<div align="center">
   <h2>⚠️ Join DegenCoding сommunity</h2>
   <img width="100" src="https://img.icons8.com/?size=100&id=S7SmOe7EhSRE&format=png&color=000000" alt="Telegram">
   <p>
