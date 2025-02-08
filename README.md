@@ -6,7 +6,7 @@
 
 <div align="center">
   <h2>⚠️ Join DegenCoding сommunity</h2>
-  <img width="100" src="https://img.icons8.com/?size=100&id=S7SmOe7EhSRE&format=png&color=000000" alt="Telegram">
+  <img width="100" src="https://img.icons8.com/?size=100&id=oWiuH0jFiU0R&format=png&color=000000" alt="Telegram">
   <p>
     <a href="https://t.me/+MRQx4biy9z02YjNi" style="text-decoration: none; margin: 0 10px;">
       <strong>Channel</strong>
