@@ -9,7 +9,6 @@ import { handleFaucet, handleGalxeGobiBearDaily, handleGobiBearDaily, saharaGetB
 import "dotenv/config"
 
 enum ActionEnum {
-  CREATE_CSV = "createCsv",
   IMPORT_CSV = "importCsv",
   HANDLE_FAUCET = "handleFaucet",
   HANDLE_ONCHAIN_TRANSACTION = "handleOnchainTransaction",
@@ -41,9 +40,6 @@ const handleAction = async (action: ActionEnum): Promise<void> => {
   case ActionEnum.IMPORT_CSV:
     await importWallets()
     return
-  case ActionEnum.CREATE_CSV:
-    createCsvTemplate()
-    return
   case ActionEnum.HANDLE_FAUCET:
     await handleFaucet()
     return
@@ -64,6 +60,7 @@ const handleAction = async (action: ActionEnum): Promise<void> => {
 
 const main = async () => {
   logAuthor()
+  createCsvTemplate()
   await createDatabase()
 
   const response = await prompts({
@@ -71,7 +68,6 @@ const main = async () => {
     name: "action",
     message: "Choose option",
     choices: [
-      { title: "Create CSV template", value: ActionEnum.CREATE_CSV, description: "Create CSV template file" },
       { title: "Import data from CSV", value: ActionEnum.IMPORT_CSV, description: "Import your wallets from CSV to DB" },
       { title: "Get info", value: ActionEnum.GET_BALANCES, description: "Get wallets balances, tx amount, shards amount" },
       { title: "Handle Galxe Gobi Bear Daily", value: ActionEnum.GALXE_GOBI_BEAR_DAILY, description: "Galxe Gobi Bear daily tasks" },
