@@ -4,6 +4,7 @@ import { getWallets } from "@/db"
 import { Client, Networks } from "@/eth-async"
 import { GlobalClient } from "@/GlobalClient"
 import { checkProxy,getRandomNumber, logger, shuffleArray  } from "@/helpers"
+import { SaharaDailyTasks } from "@/sahara"
 
 const handleFaucetTx = async (client: GlobalClient) => {
   const balance = (await client.evmClient.wallet.balance()).Ether
@@ -11,7 +12,11 @@ const handleFaucetTx = async (client: GlobalClient) => {
   const amountToSend = getRandomNumber(0.0001, 0.002)
 
   if (balance.greaterThan(new Decimal(amountToSend))) {
-    await client.sahara.sendTokens(amountToSend)
+    const isTxSuccessful = await client.sahara.sendTokens(amountToSend)
+
+    if (isTxSuccessful) {
+      await client.sahara.claimTask(SaharaDailyTasks.GenerateTransactionTask)
+    }
   }
 }
 

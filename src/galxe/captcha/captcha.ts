@@ -24,7 +24,7 @@ const solverGeeTestCaptcha = async ({ ua, accountName, proxy }: { ua: string; ac
         return e as unknown as TwoCaptchaAnswer
       })
 
-      logger.info(`Account ${accountName} | GeeTest solved`)
+      logger.success(`Account ${accountName} | GeeTest solved`)
       return result
     } catch (e) {
       logger.info(`Account ${accountName} | GeeTest captcha not solved, retrying... Error: ${e}`)
@@ -33,12 +33,23 @@ const solverGeeTestCaptcha = async ({ ua, accountName, proxy }: { ua: string; ac
   }
 }
 
-type TwoCaptchaAnswer = {
-  captcha_id: string
-  lot_number: string
-  pass_token: string
-  gen_time: string
-  captcha_output: string
+const hCapthcaBadReport = async ({ id, accountName }: { id: string; accountName: string }) => {
+  try {
+    await TwoCaptchaSolver.badReport(id)
+  } catch (error) {
+    logger.error(`Account ${accountName} | Error reporting captcha as bad: ${error}`)
+  }
 }
 
-export { solverGeeTestCaptcha }
+type TwoCaptchaAnswer = {
+  id: string
+  data: {
+    captcha_id: string
+    lot_number: string
+    pass_token: string
+    gen_time: string
+    captcha_output: string
+  }
+}
+
+export { hCapthcaBadReport,solverGeeTestCaptcha }

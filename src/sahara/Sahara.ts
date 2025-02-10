@@ -91,9 +91,10 @@ class Sahara {
 
   private async flushTask(taskID: string) {
     try {
-      await this.request<any>(this.API_URL_FLUSH_TASK, {
+      await this.request<void>(this.API_URL_FLUSH_TASK, {
         taskID,
       })
+
     } catch (error) {
       logger.error(error)
     }
@@ -101,11 +102,16 @@ class Sahara {
     await sleep(1)
 
     try {
-      await this.request<any>(this.API_URL_BATCH_TASK, {
+      const batchResponse = await this.request<DataBatchResponseTypes>(this.API_URL_BATCH_TASK, {
         taskIDs: [taskID],
       })
+
+      return batchResponse[taskID].status
+
     } catch (error) {
       logger.error(error)
+
+      return false
     }
   }
 
@@ -173,16 +179,35 @@ class Sahara {
 
     logger.info(`Account ${this.client.name} | Start claiming task ${task.name}`)
 
-    await this.flushTask(task.taskID)
+    const taskStatus = await this.flushTask(task.taskID)
+
+    if (taskStatus === "1") {
+      logger.error(`Account ${this.client.name} | Task ${task.name} is not ready for claim`)
+
+      return false
+    }
+
+    if (taskStatus === "3") {
+      logger.success(`Account ${this.client.name} | Task ${task.name} is already claimed`)
+
+      return true
+    }
 
     try {
       const response = await this.request<ClaimTaskResponseTypes>(this.API_URL_CLAIM_TASK, {
         "taskID": task.taskID,
       })
 
-      logger.success(`Account ${this.client.name} | Task claimed: ${task.name}`)
+      if (response[0].amount) {
+        logger.success(`Account ${this.client.name} | Task claimed: ${task.name}`)
 
-      return response
+        return response
+      } else {
+        console.log(response)
+
+        return false
+      }
+
     } catch (error) {
 
       logger.error(`Account ${this.client.name} | Failed to claim task ${task.name}: ${error}`)
@@ -206,11 +231,14 @@ class Sahara {
 
       if (receipt && receipt.status === 1) {
         logger.success(`Account ${this.client.name} | Transaction successful! ${this.evmClient.network.explorer}tx/${receipt.hash}`)
+        return true
       } else {
         logger.error(`Account ${this.client.name} | Error while sending tokens. Tx failed ${receipt?.hash}`)
+        return false
       }
     } catch (error) {
       logger.error(`Account ${this.client.name} | Error while sending tokens ${error}`)
+      return false
     }
   }
 

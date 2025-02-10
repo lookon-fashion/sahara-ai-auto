@@ -7,10 +7,10 @@ class GlobalClient {
   evmClient: Client
   galxe: Galxe
   sahara: Sahara
-  ref: string
+  ref: string | null
   proxy: string | null
 
-  constructor(name: string, evmClient: Client, ref: string, proxy: string | null) {
+  constructor(name: string, evmClient: Client, ref: string | null, proxy: string | null) {
     this.name = name
     this.ref = ref
     this.evmClient = evmClient

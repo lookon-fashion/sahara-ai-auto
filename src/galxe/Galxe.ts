@@ -8,7 +8,7 @@ import { AccountInfoResponse, CampaignResponse, CampaignType, CreateNewAccountRe
 import { GlobalClient } from "@/GlobalClient"
 import { getProxyConfigAxios, getRandomNumber, logger, randomStringForEntropy } from "@/helpers"
 
-import { solverGeeTestCaptcha } from "./captcha"
+import { hCapthcaBadReport, solverGeeTestCaptcha } from "./captcha"
 
 import "dotenv/config"
 
@@ -266,35 +266,56 @@ Expiration Time: ${expDate}`
     if (!this.token) await this.login()
 
     logger.info(`Account ${this.client.name} | Start task ${taskId}`)
-    const solution = await solverGeeTestCaptcha({ accountName: this.client.name, ua: this.userAgent, proxy: this.proxy })
 
-    if (!solution || !("solution" in solution)) return null
+    while (true) {
+      const solution = await solverGeeTestCaptcha({ accountName: this.client.name, ua: this.userAgent, proxy: this.proxy })
 
-    try {
-      this.request({
-        operationName: "AddTypedCredentialItems",
-        variables: {
-          input: {
-            credId: taskId,
-            campaignId: campaignId,
-            operation: "APPEND",
-            items: [`EVM:${this.evmClient.signer.address}`],
-            captcha: {
-              lotNumber: solution.lot_number,
-              captchaOutput: solution.captcha_output,
-              passToken: solution.pass_token,
-              genTime: solution.gen_time,
+      if (!solution) continue
+
+      try {
+        const response = await this.request<{
+          errors?: any[],
+          data: {
+            typedCredentialItems: {
+              id: string,
+              __typename: "Cred",
+            } | null
+          }
+        }>({
+          operationName: "AddTypedCredentialItems",
+          variables: {
+            input: {
+              credId: taskId,
+              campaignId: campaignId,
+              operation: "APPEND",
+              items: [`EVM:${this.evmClient.signer.address}`],
+              captcha: {
+                lotNumber: solution.data.lot_number,
+                captchaOutput: solution.data.captcha_output,
+                passToken: solution.data.pass_token,
+                genTime: solution.data.gen_time,
+              },
             },
           },
-        },
-        query:
-          "mutation AddTypedCredentialItems($input: MutateTypedCredItemInput!) {\n  typedCredentialItems(input: $input) {\n    id\n    __typename\n  }\n}",
-      })
+          query:
+            "mutation AddTypedCredentialItems($input: MutateTypedCredItemInput!) {\n  typedCredentialItems(input: $input) {\n    id\n    __typename\n  }\n}",
+        })
 
-      logger.success(`Account ${this.client.name} | Succsesfully completed task ${taskId}`)
-    } catch (error) {
-      logger.error(`Account ${this.client.name} | Error while task ${taskId}\n ${error}`)
+        if (response.errors?.length) {
+          console.log(response.errors)
+          await hCapthcaBadReport({ id: solution.id, accountName: this.client.name })
+          logger.error(`Account ${this.client.name} | Captcha verification failed, retrying...`)
+          continue
+        }
+
+        logger.success(`Account ${this.client.name} | Successfully completed task ${taskId}`)
+        return true
+      } catch (error) {
+        logger.error(`Account ${this.client.name} | Error while task ${taskId}\n ${error}`)
+        return false
+      }
     }
+
   }
 
   async claimTask(taskId: string) {
@@ -303,7 +324,7 @@ Expiration Time: ${expDate}`
     logger.info(`Account ${this.client.name} | Start claim task ${taskId}`)
 
     try {
-      this.request({
+      await this.request({
         operationName: "SyncCredentialValue",
         variables: {
           input: {

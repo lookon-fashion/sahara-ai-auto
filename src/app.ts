@@ -4,7 +4,7 @@ import prompts from "prompts"
 import { checkCaptchaKeys } from "@/config"
 import { createDatabase } from "@/db"
 import { createCsvTemplate, importWallets, logAuthor } from "@/helpers"
-import { handleFaucet, saharaGetBalances, saharaOnchainTransactionSend } from "@/tasks"
+import { handleFaucet, handleGalxeGobiBearDaily, handleGobiBearDaily, saharaGetBalances, saharaOnchainTransactionSend  } from "@/tasks"
 
 import "dotenv/config"
 
@@ -14,6 +14,8 @@ enum ActionEnum {
   HANDLE_FAUCET = "handleFaucet",
   HANDLE_ONCHAIN_TRANSACTION = "handleOnchainTransaction",
   GET_BALANCES = "getBalances",
+  GALXE_GOBI_BEAR_DAILY = "galxeGobiBearDaily",
+  GOBI_BEAR_DAILY = "gobiBearDaily",
 }
 
 type Choice = {
@@ -51,6 +53,12 @@ const handleAction = async (action: ActionEnum): Promise<void> => {
   case ActionEnum.GET_BALANCES:
     await saharaGetBalances()
     return
+  case ActionEnum.GALXE_GOBI_BEAR_DAILY:
+    await handleGalxeGobiBearDaily()
+    return
+  case ActionEnum.GOBI_BEAR_DAILY:
+    await handleGobiBearDaily()
+    return
   }
 }
 
@@ -65,9 +73,11 @@ const main = async () => {
     choices: [
       { title: "Create CSV template", value: ActionEnum.CREATE_CSV, description: "Create CSV template file" },
       { title: "Import data from CSV", value: ActionEnum.IMPORT_CSV, description: "Import your wallets from CSV to DB" },
-      { title: "Handle Faucet", value: ActionEnum.HANDLE_FAUCET, description: "Get tokens from faucet" },
-      { title: "Handle Onchain Transaction", value: ActionEnum.HANDLE_ONCHAIN_TRANSACTION, description: "Send tokens to wallets" },
       { title: "Get Balances", value: ActionEnum.GET_BALANCES },
+      { title: "Handle Galxe Gobi Bear Daily", value: ActionEnum.GALXE_GOBI_BEAR_DAILY, description: "Galxe Gobi Bear daily tasks" },
+      { title: "Handle Gobi Bear Daily", value: ActionEnum.GOBI_BEAR_DAILY, description: "Gobi Bear daily tasks" },
+      { title: "Handle Faucet", value: ActionEnum.HANDLE_FAUCET, description: "Get tokens from faucet" },
+      { title: "Handle Onchain Transaction + claim task on website", value: ActionEnum.HANDLE_ONCHAIN_TRANSACTION, description: "Send tokens to wallets" },
     ] as Choice[],
   }) as prompts.Answers<"action"> & { action: ActionEnum }
 

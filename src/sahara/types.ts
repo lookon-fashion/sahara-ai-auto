@@ -11,7 +11,7 @@ type SignInResponseTypes = {
 
 type ChallengeResponseTypes = { challenge: string }
 
-type ClaimTaskResponseTypes = [ { type: string, assetID: string, amount: string } ] | void
+type ClaimTaskResponseTypes = [ { type: string, assetID: string, amount: string } ]
 
 type GetTokensFromFaucetSuccessResponseTypes = {
   msg: `Txhash:${string}`
