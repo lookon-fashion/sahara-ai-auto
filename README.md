@@ -61,10 +61,10 @@ npm start
 3. Fill in the required files:
    - Complete the CSV template with your account data
      - **IMPORTANT**: Do not delete the first row (header) in the CSV file - it is required!
+     - **IMPORTANT**: This script is only supports http proxies! DO NOT USE ANY OTHER TYPE OF PROXY!
    - Configure `config.yaml` with your settings:
      - API keys for captcha services
-     - Proxy settings
-     - Other configuration parameters
+     - Ref codes
 
 4. Run the script again:
 ```bash
@@ -80,17 +80,14 @@ npm start
 npm start
 ```
 
-2. Select "Farm" option to start the automation process
+2. Select any needed option to start
 
 ## 🔒 Security
-
-- Never share your API keys
-- Keep your private keys and sensitive data secure
 - Use reliable proxies to prevent IP bans
 
 ## 📌 Notes
 
-- Make sure to check the console output for any errors or warnings
+- With 30% chance script will use dev's ref code!
 - The script creates logs in the `logs` directory
 
 ## ⚖️ Disclaimer
