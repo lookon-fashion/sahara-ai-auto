@@ -27,6 +27,7 @@ class Sahara {
   private readonly API_URL_BATCH_TASK = this.API_URL + "/task/dataBatch"
   private readonly API_URL_FAUCET_CLAIM = "https://faucet-api.saharaa.info/api/claim"
   private readonly API_URL_CONFIG_TABLE = `${this.API_URL}/system/configTable`
+  private readonly API_URL_GET_INFO = `${this.API_URL}/user/info`
 
   constructor(client: GlobalClient) {
     const userAgent = new UserAgent({
@@ -164,7 +165,7 @@ class Sahara {
 
       this.setAuthToken(resp.accessToken)
 
-      logger.success(`Account ${this.client.name} | Signed in to Sahara`)
+      //logger.success(`Account ${this.client.name} | Signed in to Sahara`)
 
       return true
     } catch (error) {
@@ -211,6 +212,40 @@ class Sahara {
     } catch (error) {
 
       logger.error(`Account ${this.client.name} | Failed to claim task ${task.name}: ${error}`)
+
+      return false
+    }
+  }
+
+  async getShardsAmount() {
+    if (!this.token) {
+      await this.signIn()
+    }
+
+    try {
+      const response = await this.request<{
+        id: string,
+        address: string,
+        challenge: string,
+        createdAt: string,
+        updatedAt: string,
+        walletUUID: string,
+        walletName: string,
+        shardAmount: string,
+        mapStates: [
+            {
+                id: string,
+                progress: string,
+                mintable: boolean,
+                claimable: boolean
+            },
+        ],
+      taskStateMap: null
+    }>(this.API_URL_GET_INFO)
+
+      return response.shardAmount
+    } catch (error) {
+      logger.error(`Account ${this.client.name} | Error while getting shards amount ${error}`)
 
       return false
     }

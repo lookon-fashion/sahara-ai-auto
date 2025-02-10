@@ -73,9 +73,9 @@ const main = async () => {
     choices: [
       { title: "Create CSV template", value: ActionEnum.CREATE_CSV, description: "Create CSV template file" },
       { title: "Import data from CSV", value: ActionEnum.IMPORT_CSV, description: "Import your wallets from CSV to DB" },
-      { title: "Get Balances", value: ActionEnum.GET_BALANCES },
+      { title: "Get info", value: ActionEnum.GET_BALANCES, description: "Get wallets balances, tx amount, shards amount" },
       { title: "Handle Galxe Gobi Bear Daily", value: ActionEnum.GALXE_GOBI_BEAR_DAILY, description: "Galxe Gobi Bear daily tasks" },
-      { title: "Handle Gobi Bear Daily", value: ActionEnum.GOBI_BEAR_DAILY, description: "Gobi Bear daily tasks" },
+      { title: "Handle Gobi Bear Daily", value: ActionEnum.GOBI_BEAR_DAILY, description: "Gobi Bear daily tasks on Sahara website" },
       { title: "Handle Faucet", value: ActionEnum.HANDLE_FAUCET, description: "Get tokens from faucet" },
       { title: "Handle Onchain Transaction + claim task on website", value: ActionEnum.HANDLE_ONCHAIN_TRANSACTION, description: "Send tokens to wallets" },
     ] as Choice[],

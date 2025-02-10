@@ -1,5 +1,5 @@
 import chalk from "chalk"
-import { writeFileSync } from "fs"
+import { existsSync,writeFileSync } from "fs"
 import { join } from "path"
 
 import { CSV_DATA_PATH } from "@/config"
@@ -56,6 +56,15 @@ export const shuffleArray = <T>(array: T[]): T[] => {
 }
 
 export const createCsvTemplate = () => {
+  if (existsSync(CSV_DATA_PATH)) {
+    console.log("----------")
+    console.log()
+    console.log(chalk.yellow(`CSV template already exists at: ${CSV_DATA_PATH}`))
+    console.log()
+    console.log("----------")
+    return
+  }
+
   const headers = ["name", "private key", "proxy"]
   const csvContent = headers.join(",") + "\n"
 
