@@ -1,5 +1,8 @@
+import chalk from "chalk"
 import { writeFileSync } from "fs"
 import { join } from "path"
+
+import { CSV_DATA_PATH } from "@/config"
 
 const alp = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
@@ -50,4 +53,17 @@ export const shuffleArray = <T>(array: T[]): T[] => {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
   }
   return shuffled
+}
+
+export const createCsvTemplate = () => {
+  const headers = ["name", "private key", "proxy"]
+  const csvContent = headers.join(",") + "\n"
+
+  writeFileSync(CSV_DATA_PATH, csvContent, "utf-8")
+
+  console.log("----------")
+  console.log()
+  console.log(chalk.green(`CSV template created at: ${CSV_DATA_PATH}`))
+  console.log()
+  console.log("----------")
 }

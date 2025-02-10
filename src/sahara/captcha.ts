@@ -113,17 +113,7 @@ const solveHCaptcha = async ({ ua, accountName, proxy }: { ua: string; accountNa
         return e as unknown as TwoCaptchaAnswer
       })
 
-      // const result = await TwoCaptchaSolver.geetestV4({
-      //   pageurl: "https://app.galxe.com/quest",
-      //   captcha_id: GALXE_GEETEST_ID,
-      //   userAgent: ua,
-      //   proxytype: proxy ? proxy.protocol : undefined,
-      //   proxy: proxy ? `${proxy.auth!.username}:${proxy.auth!.password}@${proxy.host}:${proxy.port}` : void 0,
-      // }).then(e => {
-      //   return e as unknown as TwoCaptchaAnswer
-      // })
-
-      logger.info(`Account ${accountName} | HCaptcha solved`)
+      logger.success(`Account ${accountName} | HCaptcha solved`)
       return result
     } catch (e) {
       logger.info(`Account ${accountName} | HCaptcha captcha not solved, retrying... Error: ${e}`)

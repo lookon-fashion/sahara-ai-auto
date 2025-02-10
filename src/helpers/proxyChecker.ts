@@ -4,7 +4,7 @@ import { SocksProxyAgent } from "socks-proxy-agent"
 
 import { logger } from "@/helpers"
 
-interface ProxyCheckResult {
+type ProxyCheckResult = {
   proxy: string
   isWorking: boolean
   responseTime: number | null
@@ -53,7 +53,7 @@ const checkProxy = async (proxy: string): Promise<ProxyCheckResult> => {
 
 const checkAllProxies = async (proxyList: string[]) => {
   const results: ProxyCheckResult[] = []
-  const batchSize = 5 // Check 5 proxies simultaneously
+  const batchSize = 5
 
   for (let i = 0; i < proxyList.length; i += batchSize) {
     const batch = proxyList.slice(i, i + batchSize)
@@ -73,14 +73,11 @@ const checkAllProxies = async (proxyList: string[]) => {
       results.push(result)
     })
 
-    // Small delay between batches to avoid rate limiting
     await new Promise(resolve => setTimeout(resolve, 1000))
   }
 
   const workingProxies = results.filter(r => r.isWorking)
   logger.info(`\nWorking proxies: ${workingProxies.length}/${proxyList.length}`)
-
-  // Sort working proxies by response time
   const sortedWorkingProxies = workingProxies
     .sort((a, b) => (a.responseTime || 0) - (b.responseTime || 0))
 

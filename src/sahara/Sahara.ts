@@ -191,19 +191,21 @@ class Sahara {
     }
   }
 
-  async sendTokens() {
+  async sendTokens(amount: string | number) {
 
     logger.info(`Account ${this.client.name} | Start sending tokens`)
     try {
       const txParams = {
         to: this.evmClient.signer.address,
-        value: new TokenAmount("0.0001", 18).Wei,
+        value: new TokenAmount(amount, 18).Wei,
       }
 
-      const receipt = await this.evmClient.transactions.sendTransactionAndWait(txParams)
+      const txResponse = await this.evmClient.transactions.sendTransaction(txParams)
+      await sleep(3)
+      const receipt = await this.evmClient.transactions.waitTransaction(txResponse)
 
       if (receipt && receipt.status === 1) {
-        logger.success(`Account ${this.client.name} | Transaction successful!\n${this.evmClient.network.explorer}tx/${receipt.hash}`)
+        logger.success(`Account ${this.client.name} | Transaction successful! ${this.evmClient.network.explorer}tx/${receipt.hash}`)
       } else {
         logger.error(`Account ${this.client.name} | Error while sending tokens. Tx failed ${receipt?.hash}`)
       }
@@ -213,7 +215,7 @@ class Sahara {
   }
 
   async getTokensFromFaucet() {
-    logger.info(`Account ${this.client.name} | Start getting tokens from faucet`)
+    logger.info(`Account ${this.client.name} | Start getting tokens from faucet. proxy: ${JSON.stringify(this.proxy)}`)
 
     const captchaResponse = await solveHCaptcha(
       {

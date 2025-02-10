@@ -1,26 +1,57 @@
 import chalk from "chalk"
-import fs from "fs"
 import prompts from "prompts"
 
-import { checkCaptchaKeys, CSV_DATA_PATH } from "@/config"
+import { checkCaptchaKeys } from "@/config"
 import { createDatabase } from "@/db"
-import { importWallets, logAuthor } from "@/helpers"
-
-import { handleAll } from "./farmAsync"
+import { createCsvTemplate, importWallets, logAuthor } from "@/helpers"
+import { handleFaucet, saharaGetBalances, saharaOnchainTransactionSend } from "@/tasks"
 
 import "dotenv/config"
 
-const createCsvTemplate = () => {
-  const headers = ["name", "private key", "proxy"]
-  const csvContent = headers.join(",") + "\n"
+enum ActionEnum {
+  CREATE_CSV = "createCsv",
+  IMPORT_CSV = "importCsv",
+  HANDLE_FAUCET = "handleFaucet",
+  HANDLE_ONCHAIN_TRANSACTION = "handleOnchainTransaction",
+  GET_BALANCES = "getBalances",
+}
 
-  fs.writeFileSync(CSV_DATA_PATH, csvContent, "utf-8")
+type Choice = {
+  title: string;
+  value: ActionEnum;
+  description: string;
+}
 
-  console.log("----------")
-  console.log()
-  console.log(chalk.green(`CSV template created at: ${CSV_DATA_PATH}`))
-  console.log()
-  console.log("----------")
+const isRequiresCaptcha = (action: ActionEnum): boolean => {
+  return [
+    ActionEnum.HANDLE_FAUCET,
+    ActionEnum.HANDLE_ONCHAIN_TRANSACTION,
+  ].includes(action)
+}
+
+const handleAction = async (action: ActionEnum): Promise<void> => {
+  if (isRequiresCaptcha(action) && !checkCaptchaKeys()) {
+    console.log(chalk.yellow("Please set your CAPTCHA keys in config.yaml and try again"))
+    return
+  }
+
+  switch (action) {
+  case ActionEnum.IMPORT_CSV:
+    await importWallets()
+    return
+  case ActionEnum.CREATE_CSV:
+    createCsvTemplate()
+    return
+  case ActionEnum.HANDLE_FAUCET:
+    await handleFaucet()
+    return
+  case ActionEnum.HANDLE_ONCHAIN_TRANSACTION:
+    await saharaOnchainTransactionSend()
+    return
+  case ActionEnum.GET_BALANCES:
+    await saharaGetBalances()
+    return
+  }
 }
 
 const main = async () => {
@@ -32,22 +63,15 @@ const main = async () => {
     name: "action",
     message: "Choose option",
     choices: [
-      { title: "Create CSV template", value: "createCsv", description: "Create CSV template file" },
-      { title: "Import data from CSV", value: "importCsv", description: "Import your wallets from CSV to DB" },
-      { title: "Farm", value: "farm", description: "Just farm" },
-    ],
-  })
+      { title: "Create CSV template", value: ActionEnum.CREATE_CSV, description: "Create CSV template file" },
+      { title: "Import data from CSV", value: ActionEnum.IMPORT_CSV, description: "Import your wallets from CSV to DB" },
+      { title: "Handle Faucet", value: ActionEnum.HANDLE_FAUCET, description: "Get tokens from faucet" },
+      { title: "Handle Onchain Transaction", value: ActionEnum.HANDLE_ONCHAIN_TRANSACTION, description: "Send tokens to wallets" },
+      { title: "Get Balances", value: ActionEnum.GET_BALANCES },
+    ] as Choice[],
+  }) as prompts.Answers<"action"> & { action: ActionEnum }
 
-  if (response.action === "importCsv") await importWallets()
-  if (response.action === "createCsv") createCsvTemplate()
-  if (response.action === "farm") {
-    if (!checkCaptchaKeys()) {
-      console.log(chalk.yellow("Please set your CAPTCHA keys in config.yaml and try again"))
-      return
-    }
-
-    await handleAll()
-  }
+  await handleAction(response.action)
 }
 
 main()
