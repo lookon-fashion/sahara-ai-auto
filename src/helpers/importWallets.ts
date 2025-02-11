@@ -3,7 +3,7 @@ import { parse } from "csv-parse/sync"
 import fs from "fs"
 
 import { CSV_DATA_PATH, REF_CODES } from "@/config"
-import { getWallet, Wallet } from "@/db"
+import { getWallet, getWallets, Wallet } from "@/db"
 import { Client } from "@/eth-async"
 
 const DEV_REF_CODE = "NQWD0N"
@@ -22,7 +22,7 @@ const importWallets = async () => {
 
   let imported = 0
   let edited = 0
-  const total = records.length
+  const total = (await getWallets()).length
 
   for (const wallet of records) {
     const walletInstance = await getWallet(wallet["private key"])
