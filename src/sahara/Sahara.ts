@@ -278,7 +278,7 @@ class Sahara {
   }
 
   async getTokensFromFaucet() {
-    logger.info(`Account ${this.client.name} | Start getting tokens from faucet. proxy: ${JSON.stringify(this.proxy)}`)
+    logger.info(`Account ${this.client.name} | Start getting tokens from faucet`)
 
     const captchaResponse = await solveHCaptcha(
       {
