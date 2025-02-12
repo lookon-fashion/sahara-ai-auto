@@ -25,7 +25,7 @@ class Sahara {
   private readonly API_URL_FLUSH_ALL_TASK = this.API_URL + "/task/flushAll"
   private readonly API_URL_CLAIM_TASK = this.API_URL + "/task/claim"
   private readonly API_URL_BATCH_TASK = this.API_URL + "/task/dataBatch"
-  private readonly API_URL_FAUCET_CLAIM = "https://faucet-api.saharaa.info/api/claim"
+  private readonly API_URL_FAUCET_CLAIM = "https://faucet-api.saharaa.info/api/claim2"
   private readonly API_URL_CONFIG_TABLE = `${this.API_URL}/system/configTable`
   private readonly API_URL_GET_INFO = `${this.API_URL}/user/info`
 
