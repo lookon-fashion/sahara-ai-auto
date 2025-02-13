@@ -180,6 +180,8 @@ class Sahara {
 
     logger.info(`Account ${this.client.name} | Start claiming task ${task.name}`)
 
+    await this.flushTask(task.taskID)
+    await sleep(1)
     const taskStatus = await this.flushTask(task.taskID)
 
     if (taskStatus === "1") {
@@ -194,27 +196,32 @@ class Sahara {
       return true
     }
 
-    try {
-      const response = await this.request<ClaimTaskResponseTypes>(this.API_URL_CLAIM_TASK, {
-        "taskID": task.taskID,
-      })
+    let counter = 0
 
-      if (response[0].amount) {
-        logger.success(`Account ${this.client.name} | Task claimed: ${task.name}`)
+    while (counter !== 3) {
+      try {
+        const response = await this.request<ClaimTaskResponseTypes>(this.API_URL_CLAIM_TASK, {
+          "taskID": task.taskID,
+        })
 
-        return response
-      } else {
-        console.log(response)
+        if (response[0].amount) {
+          logger.success(`Account ${this.client.name} | Task claimed: ${task.name}`)
 
-        return false
+          return response
+        }
+
+      } catch (error) {
+        //logger.error(`Account ${this.client.name} | Failed to claim task ${task.name}: ${error}`)
+
       }
 
-    } catch (error) {
+      counter++
 
-      logger.error(`Account ${this.client.name} | Failed to claim task ${task.name}: ${error}`)
-
-      return false
+      if (counter === 2) {
+        logger.error(`Account ${this.client.name} | Failed to claim task ${task.name}`)
+      }
     }
+
   }
 
   async getShardsAmount() {
