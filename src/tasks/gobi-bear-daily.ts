@@ -5,15 +5,19 @@ import { checkProxy,getRandomNumber, logger, shuffleArray, sleep  } from "@/help
 import { SaharaDailyTasks } from "@/sahara"
 
 const galxeGobiBearDaily = async (client: GlobalClient) => {
-  await client.galxe.handleVisitPageTask({ taskId: "507361624877694976", campaignId: "GCNLYtpFM5" })
-  await sleep(getRandomNumber(2, 5, true))
-  await client.galxe.handleVisitPageTask({ taskId: "505649247018811392", campaignId: "GCNLYtpFM5" })
+  try {
+    await client.galxe.handleVisitPageTask({ taskId: "507361624877694976", campaignId: "GCNLYtpFM5" })
+    await sleep(getRandomNumber(2, 5, true))
+    await client.galxe.handleVisitPageTask({ taskId: "505649247018811392", campaignId: "GCNLYtpFM5" })
 
-  await sleep(getRandomNumber(2, 5, true))
+    await sleep(getRandomNumber(2, 5, true))
 
-  await client.galxe.claimTask("505649247018811392")
-  await sleep(getRandomNumber(2, 5, true))
-  await client.galxe.claimTask("507361624877694976")
+    await client.galxe.claimTask("505649247018811392")
+    await sleep(getRandomNumber(2, 5, true))
+    await client.galxe.claimTask("507361624877694976")
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 const handleGalxeGobiBearDaily = async () => {
